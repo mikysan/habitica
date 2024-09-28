@@ -1,0 +1,22 @@
+name: Rebase Upstream
+on:
+  schedule:
+    - cron: "38 1 * * *" # run every night
+  workflow_dispatch: # allow manual running
+
+env:
+  # using a manually defined access token, so that a push will trigger other workflows
+  # see also: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow
+  GITHUB_TOKEN: ${{ secrets.ACTIONS_ACCESS_TOKEN }}
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 1000 # greater than the number of commits you made
+      - uses: imba-tjd/rebase-upstream-action@0.5
+        with:
+          upstream: HabitRPG/habitica
+          branch: release

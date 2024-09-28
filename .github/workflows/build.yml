@@ -1,0 +1,80 @@
+name: Production Build
+
+on:
+  push:
+    branches:
+      - cerritus-adaptions
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cp config.json.example config.json
+      - name: NPM install
+        run: |
+          npm install
+        env:
+          CI: true
+          NODE_ENV: production
+      - name: Build the server
+        run: |
+          ./node_modules/.bin/gulp build:prod
+        env:
+          CI: true
+          NODE_ENV: production
+      - name: Build the client
+        run: |
+          npm run client:build
+        env:
+          CI: true
+          NODE_ENV: production
+      - name: Archive server build
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          filename: 'habitica-server.zip'
+          path: website/transpiled-babel
+      - name: Archive server common build
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          filename: 'habitica-server-common.zip'
+          path: website/common/transpiled-babel
+      - name: Archive client build
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          filename: 'habitica-client.zip'
+          path: website/client/dist/
+          exclusions: '*.md'
+      - name: Archive i18n cache
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          filename: 'habitica-i18n-cache.zip'
+          path: i18n_cache/
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.ACTIONS_ACCESS_TOKEN }}"
+          prerelease: false
+          automatic_release_tag: "latest"
+          files: |
+            habitica-server.zip
+            habitica-server-common.zip
+            habitica-client.zip
+            habitica-i18n-cache.zip
