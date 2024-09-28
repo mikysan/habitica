@@ -112,16 +112,6 @@
             {{ $t('youHaveGroupPlan') }}
           </div>
           <div
-            v-else
-            class="w-55 text-center"
-            v-html="$t('paymentSubBillingWithMethod', {
-              amount: purchasedPlanIdInfo.price,
-              months: purchasedPlanIdInfo.months,
-              paymentMethod: purchasedPlanIdInfo.plan
-            })"
-          >
-          </div>
-          <div
             v-if="canEditCardDetails"
             class="mt-4 text-center"
           >
@@ -298,54 +288,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div
-      v-if="hasSubscription && !hasCanceledSubscription"
-      class="d-flex flex-column align-items-center mt-3"
-    >
-      <div class="cancel-card p-4 text-center">
-        <h2 class="maroon-50">
-          {{ $t('cancelYourSubscription') }}
-        </h2>
-        <div v-if="hasGroupPlan">
-          {{ $t('cancelSubInfoGroupPlan') }}
-        </div>
-        <div
-          v-if="!hasGroupPlan && !canCancelSubscription"
-          v-html="$t(`cancelSubInfo${user.purchased.plan.paymentMethod}`)"
-        >
-        </div>
-        <div
-          v-if="canCancelSubscription"
-          v-html="$t('cancelSubAlternatives')"
-        >
-        </div>
-        <div
-          class="btn btn-danger mt-4"
-          :class="{disabled: !canCancelSubscription}"
-          :disabled="!canCancelSubscription"
-          @click="cancelSubscriptionConfirm({canCancel: canCancelSubscription})"
-        >
-          {{ $t('cancelSub') }}
-        </div>
-      </div>
-    </div>
-    <div class="d-flex flex-column align-items-center mt-4">
-      <div
-        v-once
-        class="svg-icon svg-gift-box m-auto"
-        v-html="icons.giftBox"
-      >
-      </div>
-      <div class="muted mx-auto mt-3 mb-1">
-        {{ $t('giftSubscription') }}
-      </div>
-      <a
-        class="mx-auto"
-        @click="showSelectUser()"
-      >
-        {{ $t('giftASubscription') }}
-      </a>
     </div>
   </div>
 </template>
