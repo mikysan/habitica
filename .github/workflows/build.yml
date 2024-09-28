@@ -42,31 +42,10 @@ jobs:
         env:
           CI: true
           NODE_ENV: production
-      - name: Archive server build
-        uses: thedoctor0/zip-release@main
-        with:
-          type: 'zip'
-          filename: 'habitica-server.zip'
-          path: website/transpiled-babel
-      - name: Archive server common build
-        uses: thedoctor0/zip-release@main
-        with:
-          type: 'zip'
-          filename: 'habitica-server-common.zip'
-          path: website/common/transpiled-babel
-      - name: Archive client build
-        uses: thedoctor0/zip-release@main
-        with:
-          type: 'zip'
-          filename: 'habitica-client.zip'
-          path: website/client/dist/
-          exclusions: '*.md'
-      - name: Archive i18n cache
-        uses: thedoctor0/zip-release@main
-        with:
-          type: 'zip'
-          filename: 'habitica-i18n-cache.zip'
-          path: i18n_cache/
+      - name: Install zip
+        uses: montudor/action-zip@v1
+      - name: Create release archive
+        run: zip -r habitica-release.zip website/transpiled-babel website/common/transpiled-babel website/client/dist i18n_cache content_cache
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -74,7 +53,4 @@ jobs:
           prerelease: false
           automatic_release_tag: "latest"
           files: |
-            habitica-server.zip
-            habitica-server-common.zip
-            habitica-client.zip
-            habitica-i18n-cache.zip
+            habitica-release.zip
