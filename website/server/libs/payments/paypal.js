@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+/*
 import nconf from 'nconf';
 import moment from 'moment';
 import util from 'util';
@@ -222,7 +223,7 @@ api.subscribeSuccess = async function subscribeSuccess (options = {}) {
     headers,
   });
 };
-
+*/
 /**
  * Cancel a PayPal Subscription
  *
@@ -233,6 +234,7 @@ api.subscribeSuccess = async function subscribeSuccess (options = {}) {
  *
  * @return undefined
  */
+/*
 api.subscribeCancel = async function subscribeCancel (options = {}) {
   const { groupId, user, cancellationReason } = options;
 
@@ -324,3 +326,4 @@ api.ipn = async function ipnApi (options = {}) {
 };
 
 export default api;
+*/
