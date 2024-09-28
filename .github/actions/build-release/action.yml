@@ -1,0 +1,47 @@
+name: Production Build
+inputs:
+  release_access_token:
+    required: true
+    description: "Access token used to create a release"
+runs:
+  using: "composite"
+  steps:
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Copy config file from example
+      shell: bash
+      run: cp config.json.example config.json
+    - name: NPM install
+      shell: bash
+      run: npm install
+      env:
+        CI: true
+        NODE_ENV: production
+    - name: Build the server
+      shell: bash
+      run: ./node_modules/.bin/gulp build:prod
+      env:
+        CI: true
+        NODE_ENV: production
+    - name: Build the client
+      shell: bash
+      run: npm run client:build
+      env:
+        CI: true
+        NODE_ENV: production
+    - name: Install zip
+      uses: montudor/action-zip@v1
+    - name: Create release archive
+      shell: bash
+      run: zip -r habitica-release.zip website/transpiled-babel website/common/transpiled-babel website/client/dist i18n_cache content_cache
+    - name: Create release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ inputs.release_access_token }}"
+        prerelease: false
+        automatic_release_tag: "latest"
+        files: |
+          habitica-release.zip
+

@@ -3,20 +3,65 @@ on:
   schedule:
     - cron: "38 1 * * *" # run every night
   workflow_dispatch: # allow manual running
-
-env:
-  # using a manually defined access token, so that a push will trigger other workflows
-  # see also: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow
-  GITHUB_TOKEN: ${{ secrets.ACTIONS_ACCESS_TOKEN }}
+  push:
+    branches:
+      - cerritus-adaptions
 
 jobs:
-  rebase:
+  Rebase:
     runs-on: ubuntu-latest
+    outputs:
+      rebased: ${{ steps.rebase.outputs.rebased }}
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1000 # greater than the number of commits you made
-      - uses: imba-tjd/rebase-upstream-action@0.5
+
+      - id: rebase
+        name: Rebase on upstream release branch
+        run: |
+          set -ex
+
+          UPSTREAM="HabitRPG/habitica"
+          if [ -z $UPSTREAM ]; then
+              echo ${{ github.token }} | gh auth login --with-token
+              UPSTREAM=$(gh api repos/:owner/:repo --jq .parent.full_name)
+              if [ -z $UPSTREAM ]; then echo "Can't find upstream" >&2 && exit 1; fi
+          fi
+          if [ ! $(echo $UPSTREAM | egrep '^(http|git@)') ]; then
+              UPSTREAM=https://github.com/$UPSTREAM.git
+          fi
+
+          git remote add upstream $UPSTREAM
+
+          git fetch upstream release
+
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name  "GitHub Actions"
+
+          git rebase upstream/release
+          if [ "$(git status | grep diverged)" ]; then
+              git push origin $(git branch --show-current) --force-with-lease
+              echo "rebased=true" >> $GITHUB_OUTPUT
+          else
+            echo "rebased=false" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+  Build:
+    needs: Rebase
+    if: needs.Rebase.outputs.rebased == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          upstream: HabitRPG/habitica
-          branch: release
+          ref: cerritus-adaptions
+          fetch-depth: 1
+      - name: Build release
+        uses: ./.github/actions/build-release
+        with:
+          release_access_token: ${{ secrets.ACTIONS_ACCESS_TOKEN }}

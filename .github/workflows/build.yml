@@ -10,47 +10,17 @@ permissions:
   contents: read
 
 jobs:
-  production-build:
+  Build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [14.x]
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Build release
+        uses: ./.github/actions/build-release
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: cp config.json.example config.json
-      - name: NPM install
-        run: |
-          npm install
-        env:
-          CI: true
-          NODE_ENV: production
-      - name: Build the server
-        run: |
-          ./node_modules/.bin/gulp build:prod
-        env:
-          CI: true
-          NODE_ENV: production
-      - name: Build the client
-        run: |
-          npm run client:build
-        env:
-          CI: true
-          NODE_ENV: production
-      - name: Install zip
-        uses: montudor/action-zip@v1
-      - name: Create release archive
-        run: zip -r habitica-release.zip website/transpiled-babel website/common/transpiled-babel website/client/dist i18n_cache content_cache
-      - name: Create release
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.ACTIONS_ACCESS_TOKEN }}"
-          prerelease: false
-          automatic_release_tag: "latest"
-          files: |
-            habitica-release.zip
+          release_access_token: ${{ secrets.ACTIONS_ACCESS_TOKEN }}
