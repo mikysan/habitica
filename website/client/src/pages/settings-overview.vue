@@ -190,7 +190,6 @@ export default {
         'general',
         'subscription',
         'siteData',
-        'promoCode',
         'transactions',
         'notifications',
       ],
