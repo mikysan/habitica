@@ -193,8 +193,6 @@ api.createGroupPlan = {
     const { user } = res.locals;
     const group = new Group(Group.sanitize(req.body.groupToCreate));
 
-    req.checkBody('paymentType', res.t('paymentTypeRequired')).notEmpty();
-    req.checkBody('summary', apiError('summaryLengthExceedsMax')).isLength({ max: MAX_SUMMARY_SIZE_FOR_GUILDS });
     const validationErrors = req.validationErrors();
     if (validationErrors) throw validationErrors;
 
@@ -204,6 +202,18 @@ api.createGroupPlan = {
     user.guilds.push(group._id);
 
     const results = await Promise.all([user.save(), group.save()]);
+
+    await payments.createSubscription({
+      user,
+      customerId: 'habitrpg',
+      paymentMethod: '',
+      sub: {
+        key: 'group_monthly',
+        quantity: 100000,
+      },
+      groupId: group._id,
+    });
+
     const savedGroup = results[1];
 
     res.analytics.track('join group', {
