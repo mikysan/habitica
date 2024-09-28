@@ -153,11 +153,6 @@ async function addSubToGroupUser (member, group) {
       return;
     }
 
-    if (member.hasNotCancelled()) {
-      await member.cancelSubscription({ cancellationReason: JOINED_GROUP_PLAN });
-      previousSubscriptionType = EMAIL_TEMPLATE_SUBSCRIPTION_TYPE_NORMAL;
-    }
-
     const today = new Date();
     plan = member.purchased.plan.toObject();
     let extraMonths = Number(plan.extraMonths);
