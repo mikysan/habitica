@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="pt-0 px-0">
-      <div v-if="!hasSubscription && !hasCanceledSubscription">
+      <!--<div v-if="!hasSubscription && !hasCanceledSubscription">
         <div class="d-flex flex-column justify-content-center align-items-center
           purple-gradient full-banner mb-4"
         >
@@ -368,7 +368,7 @@
           v-html="$t(`cancelSubInfo${user.purchased.plan.paymentMethod}`)"
         >
         </div>
-      </div>
+      </div>-->
     </div>
     <div class="d-flex flex-column justify-content-center">
       <div class="d-flex justify-content-center">
