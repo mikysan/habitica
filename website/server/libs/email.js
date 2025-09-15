@@ -148,6 +148,11 @@ export async function sendTxn (mailingInfoArray, emailType, variables, personalV
   }
 
   if (IS_PROD && mailingInfoArray.length > 0) {
+    if (EMAIL_SERVER.url === undefined || EMAIL_SERVER.url === '') {
+      logger.info('Will not send email, because there is no mail server configured.');
+      return null;
+    }
+
     return sendJob('email', {
       data: {
         emailType,
