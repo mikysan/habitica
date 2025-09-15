@@ -26,100 +26,73 @@
               <p class="section-main">
                 {{ $t('timeToGetThingsDone', {userCountInMillions}) }}
               </p>
-            </div>
-            <div class="w-33 ml-5">
-              <h3 class="text-center">
-                {{ $t('singUpForFree') }}
-              </h3>
-              <form
-                class="form pb-0"
-                @submit.prevent.stop="proceed('local')"
+              <input
+                id="usernameInput"
+                v-model="username"
+                class="form-control input-with-error"
+                type="text"
+                :placeholder="$t('username')"
+                :class="{'input-valid': usernameValid, 'input-invalid': usernameInvalid}"
               >
-                <input
-                  v-model="email"
-                  class="form-control input-with-error dark"
-                  type="email"
-                  :placeholder="$t('email')"
-                  :class="{
-                    'mb-3': !emailError,
-                    'input-valid': emailValid,
-                    'input-invalid mb-2': emailError,
-                  }"
-                >
-                <div
-                  v-if="emailError"
-                  class="input-error"
-                >
-                  {{ emailError }}
-                </div>
-                <input
-                  v-model="password"
-                  class="form-control input-with-error dark"
-                  type="password"
-                  :placeholder="$t('password')"
-                  :class="{
-                    'mb-3': !passwordInvalid,
-                    'input-valid': passwordValid,
-                    'input-invalid mb-2': passwordInvalid,
-                  }"
-                >
-                <div
-                  v-if="passwordInvalid"
-                  class="input-error"
-                >
-                  {{ $t('minPasswordLength') }}
-                </div>
-                <input
-                  v-model="passwordConfirm"
-                  class="form-control input-with-error dark"
-                  type="password"
-                  :placeholder="$t('confirmPassword')"
-                  :class="{
-                    'mb-3': !passwordConfirmInvalid,
-                    'input-invalid mb-2': passwordConfirmInvalid,
-                    'input-valid': passwordConfirmValid}"
-                >
-                <div
-                  v-if="passwordConfirmInvalid"
-                  class="input-error"
-                >
-                  {{ $t('passwordConfirmationMatch') }}
-                </div>
-                <button
-                  id="continue-button"
-                  class="btn btn-block btn-info"
-                  :disabled="!(emailValid && passwordValid && passwordConfirmValid)"
-                  type="submit"
-                >
-                  {{ $t('continue') }}
-                </button>
-              </form>
-              <div class="strike">
-                <span>{{ $t('or') }}</span>
+              <!-- eslint-disable vue/require-v-for-key -->
+              <div
+                v-for="issue in usernameIssues"
+                class="input-error"
+              >
+                <!-- eslint-enable vue/require-v-for-key -->
+                {{ issue }}
               </div>
-              <div class="text-center">
-                <button
-                  class="social-button"
-                  @click="proceed('google')"
-                >
-                  <div
-                    class="svg-icon social-icon"
-                    v-html="icons.googleIcon"
-                  ></div>
-                  <span>{{ $t('signUpWithSocial', {social: 'Google'}) }}</span>
-                </button>
-                <button
-                  class="social-button"
-                  @click="proceed('apple')"
-                >
-                  <div
-                    class="svg svg-icon social-icon apple-icon color"
-                    v-html="icons.appleIcon"
-                  ></div>
-                  <span>{{ $t('signUpWithSocial', {social: 'Apple'}) }}</span>
-                </button>
+              <input
+                v-model="email"
+                class="form-control"
+                type="email"
+                :placeholder="$t('email')"
+                :class="{'input-invalid': emailInvalid, 'input-valid': emailValid}"
+              >
+              <input
+                v-model="password"
+                class="form-control input-with-error"
+                type="password"
+                :placeholder="$t('password')"
+                :class="{
+                  'input-valid': passwordValid,
+                  'input-invalid': passwordInvalid,
+                }"
+              >
+              <div
+                v-if="passwordInvalid"
+                class="input-error"
+              >
+                {{ $t('minPasswordLength') }}
               </div>
-            </div>
+              <input
+                v-model="passwordConfirm"
+                class="form-control input-with-error"
+                type="password"
+                :placeholder="$t('confirmPassword')"
+                :class="{
+                  'input-invalid': passwordConfirmInvalid,
+                  'input-valid': passwordConfirmValid}"
+              >
+              <div
+                v-if="passwordConfirmInvalid"
+                class="input-error"
+              >
+                {{ $t('passwordConfirmationMatch') }}
+              </div>
+              <p
+                v-once
+                class="form-text"
+                v-html="$t('termsAndAgreement')"
+              ></p>
+              <button
+                class="btn btn-block btn-info sign-up"
+                :disabled="signupFormInvalid"
+                type="submit"
+              >
+                {{ $t('signup') }}
+              </button>
+            </form>
           </div>
           <div class="col-12">
             <div
@@ -239,105 +212,29 @@
           </div>
         </div>
         <div
-          id="level-up-anywhere"
-          class="bg-purple-50 white"
-        >
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-6 col-lg-6">
-                <div class="iphones"></div>
-              </div>
-              <div class="col-12 col-md-6 col-lg-6 text-column">
-                <h2>{{ $t('levelUpAnywhere') }}</h2>
-                <p>{{ $t('levelUpAnywhereDesc') }}</p>
-                <a
-                  class="app svg-icon"
-                  href="https://play.google.com/store/apps/details?id=com.habitrpg.android.habitica"
-                  target="_blank"
-                  v-html="icons.googlePlay"
-                ></a>
-                <a
-                  class="app svg-icon"
-                  href="https://itunes.apple.com/us/app/habitica-gamified-task-manager/id994882113?mt=8"
-                  target="_blank"
-                  v-html="icons.iosAppStore"
-                ></a>
-              </div>
-            </div>
-          </div>
-          <div class="container-fluid">
-            <div
-              class="pixel-horizontal-3 svg-icon"
-              v-html="icons.pixelHorizontal3"
-            ></div>
-          </div>
+          class="pixel-horizontal-2 svg-icon"
+          v-html="icons.pixelHorizontal2"
+        ></div>
+      </div>
+    </div>
+    <div
+      id="call-to-action"
+      class="purple-4"
+    >
+      <div class="container featured">
+        <div class="row text-center">
+          <h3 class="col-12">
+            {{ $t('joinMany', {userCountInMillions}) }}
+          </h3>
         </div>
-        <div
-          id="call-to-action"
-          class="purple-4 white"
-        >
-          <div class="container featured">
-            <div class="row text-center">
-              <h3 class="col-12">
-                {{ $t('joinMany', {userCountInMillions}) }}
-              </h3>
-            </div>
-            <div class="row">
-              <div class="col-12 text-center">
-                <button
-                  class="btn btn-primary btn-front join-button"
-                  @click="playButtonClick()"
-                >
-                  {{ $t('joinToday') }}
-                </button>
-              </div>
-            </div>
-            <div class="row featured">
-              <div class="col-12 text-center">
-                <strong>{{ $t('featuredIn') }}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="container-fluid featured">
-            <div class="row">
-              <div class="col-12 text-center">
-                <div
-                  class="lifehacker svg-icon"
-                  v-html="icons.lifehacker"
-                ></div>
-                <div
-                  class="thenewyorktimes svg-icon"
-                  v-html="icons.thenewyorktimes"
-                ></div>
-                <div
-                  class="makeuseof svg-icon"
-                  v-html="icons.makeuseof"
-                ></div>
-                <div
-                  class="forbes svg-icon"
-                  v-html="icons.forbes"
-                ></div>
-                <div
-                  class="cnet svg-icon"
-                  v-html="icons.cnet"
-                ></div>
-                <div
-                  class="kickstarter svg-icon"
-                  v-html="icons.kickstarter"
-                ></div>
-                <div
-                  class="fast-company svg-icon"
-                  v-html="icons.fastCompany"
-                ></div>
-                <div
-                  class="discover svg-icon"
-                  v-html="icons.discover"
-                ></div>
-              </div>
-            </div>
-          </div>
-          <div class="container-fluid">
-            <div class="row seamless_stars_varied_opacity_repeat"></div>
+        <div class="row">
+          <div class="col-12 text-center">
+            <button
+              class="btn btn-primary btn-front join-button"
+              @click="playButtonClick()"
+            >
+              {{ $t('joinToday') }}
+            </button>
           </div>
         </div>
       </div>
