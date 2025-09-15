@@ -3,6 +3,7 @@ import { TAVERN_ID } from '../models/group'; // eslint-disable-line import/no-cy
 import { encrypt } from './encryption';
 import common from '../../common';
 import { sendJob } from './worker';
+import sendEmail from './emailSmtp';
 
 const IS_PROD = nconf.get('IS_PROD');
 const BASE_URL = nconf.get('BASE_URL');
@@ -152,6 +153,8 @@ export async function sendTxn (mailingInfoArray, emailType, variables, personalV
       logger.info('Will not send email, because there is no mail server configured.');
       return null;
     }
+
+    return sendEmail(emailType, variables, personalVariables);
 
     return sendJob('email', {
       data: {
