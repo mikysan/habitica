@@ -1,3 +1,4 @@
+/*
 import forEach from 'lodash/forEach';
 import isEqual from 'lodash/isEqual';
 import keys from 'lodash/keys';
@@ -65,8 +66,10 @@ function _gatherUserStats (properties) {
   if (user.contributor.level) properties.contributorLevel = user.contributor.level;
   if (user.purchased.plan.planId) properties.subscription = user.purchased.plan.planId;
 }
+*/
 
 export function safeSetup (userId) {
+  /*
   if (analyticsLoading || analyticsReady) return;
   analyticsLoading = true;
   install(GA_ID, {
@@ -76,9 +79,11 @@ export function safeSetup (userId) {
   amplitude.getInstance().init(AMPLITUDE_KEY, userId);
   analyticsReady = true;
   analyticsLoading = false;
+  */
 }
 
 export function track (properties, options = {}) {
+  /*
   const user = _getConsentedUser();
   if (!user) return;
   safeSetup(user._id);
@@ -96,9 +101,11 @@ export function track (properties, options = {}) {
       store.dispatch('analytics:trackEvent', properties);
     }
   });
+  */
 }
 
 export function updateUser (properties = {}) {
+  /*
   const user = _getConsentedUser();
   if (!user) return;
   safeSetup(user._id);
@@ -111,4 +118,5 @@ export function updateUser (properties = {}) {
       amplitude.getInstance().identify(identify);
     });
   });
+  */
 }
