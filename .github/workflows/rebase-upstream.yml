@@ -1,0 +1,68 @@
+# Rebase notturno del branch lumis su awinterstein/habitica:self-host.
+#
+# La catena e': HabitRPG/habitica:release -> awinterstein:self-host -> mikysan:lumis.
+# awinterstein si ribasa su upstream alle 01:38 UTC, quindi questo gira un'ora dopo,
+# quando la sua punta e' gia' aggiornata.
+#
+# Le patch locali vivono come commit in cima a lumis e vengono riapplicate a ogni giro.
+# In caso di conflitto il rebase viene abortito e il job fallisce: meglio un branch fermo
+# e un errore visibile che un force-push a meta'.
+name: Rebase su awinterstein
+
+on:
+  schedule:
+    - cron: '38 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    outputs:
+      rebased: ${{ steps.rebase.outputs.rebased }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: lumis
+          fetch-depth: 1000
+
+      - id: rebase
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git remote add fork https://github.com/awinterstein/habitica.git
+          git fetch fork self-host
+
+          before="$(git rev-parse HEAD)"
+
+          if ! git rebase fork/self-host; then
+            git rebase --abort || true
+            echo 'rebased=false' >> "$GITHUB_OUTPUT"
+            echo "::error::Rebase in conflitto con awinterstein:self-host. Il branch lumis non e stato toccato: risolvere a mano."
+            exit 1
+          fi
+
+          after="$(git rev-parse HEAD)"
+
+          if [ "$before" = "$after" ]; then
+            echo 'rebased=false' >> "$GITHUB_OUTPUT"
+            echo "Nessuna novita da awinterstein: niente rebuild."
+          else
+            git push origin lumis --force-with-lease
+            echo 'rebased=true' >> "$GITHUB_OUTPUT"
+            echo "Ribasato: ${before:0:8} -> ${after:0:8}"
+          fi
+
+  build:
+    needs: rebase
+    if: needs.rebase.outputs.rebased == 'true'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-lumis.yml
